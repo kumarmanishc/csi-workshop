@@ -28,36 +28,69 @@ let questions = [
     }
 ];
 
+let userAns = [];
+
 $(document).ready(function () {
-    var currentIndex = 2;
-    var currentQuestion = questions[0];
-    console.log(currentQuestion);   
+    var currentIndex = 0;
     prepareTemplate(currentIndex);
 });
 
 
 function prepareTemplate(index) {
     const currentQuestion = questions[index];
-    console.log(currentQuestion);
+
     document.getElementById('questionTitle').innerHTML = currentQuestion.question;
 
-    const template = `<li class="list-group-item">
+    const answer = currentQuestion.answers;
+
+    const answersKeys = Object.keys(currentQuestion.answers);
+
+    let template = '';
+
+    answersKeys.forEach((ans, i) => {
+        template += `<li class="list-group-item">
                         <div class="custom-control custom-radio">
-                            <input type="radio" id="answer1" name="answer" value="1" class="custom-control-input">
-                            <label class="custom-control-label" for="answer1">Colorful Style Sheet</label>
+                            <input type="radio" id="answer${i + 1}" name="answer" value="${ans}" class="custom-control-input">
+                            <label class="custom-control-label" for="answer${i + 1}">${answer[ans]}</label>
                         </div>
                     </li>`;
+    });
+
+    template += `<li class="list-group-item"><button type="button" class="btn btn-primary" onclick="displayRadioValue(${index + 1})">Submit</button></li>`;
+
+    document.getElementById('quizwizard').innerHTML = template;
+
 }
 
 
-function displayRadioValue() {
-    var ele = document.getElementsByName('answer');
-    console.log('Ans', ele);
-    for (i = 0; i < ele.length; i++) {
-        if (ele[i].checked) { 
-            console.log(ele[i].value);
+function displayRadioValue(nextIndex) {
+
+    let selectedQuestion = questions[nextIndex - 1];
+
+    var options = document.getElementsByName('answer');
+
+    let selectedAnd = false;
+
+    for (i = 0; i < options.length; i++) {
+        if (options[i].checked) {
+            selectedAnd = options[i];
         }
-            // document.getElementById("result").innerHTML
-            //     = "Gender: " + ele[i].value;
+    }
+
+    if (selectedQuestion.correctAnswer === selectedAnd.value) {
+        console.log("Options are correct : ");
+    } else {
+        console.log('Wrong answer');
+    }
+    selectedQuestion.userOption = selectedAnd.value;
+    userAns.push(selectedQuestion);
+
+    if (nextIndex >= questions.length) {
+        console.log("User Answers :",userAns);
+       let successTemplate = `<li class="list-group-item"><button type="button" class="btn btn-info" onclick="displayResult()">Show Quiz Result</button></li>`;
+
+        document.getElementById('quizwizard').innerHTML = "<b>Question is submitted successfully</b><br/>" + successTemplate;
+    } else {
+        prepareTemplate(nextIndex);
     }
 } 
