@@ -1,3 +1,9 @@
 .clg-image{
     background: linear-gradient(#000,#fff);
 }
+.custom-card{
+    width: 50%;
+    display: block;
+    margin: auto;
+    margin-top: 5%;
+}

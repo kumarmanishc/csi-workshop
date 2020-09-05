@@ -41,10 +41,13 @@ function getCurrenIndex(params = 'currentQueIndex') {
 
 
 function getTime(val) {
-    var valString = val + "";
+    let valString = val + "";
+    
     if (valString.length < 2) {
+      
         return "0" + valString;
     } else {
+     
         return valString;
     }
 }
@@ -52,7 +55,7 @@ function getTime(val) {
 function startTimer(sec) {
 
     this.timer = setTimeout(() => {
-
+        
         document.getElementById('time').innerHTML = `<span>${getTime(parseInt(sec / 60))}</span>:<span>${getTime(sec % 60)}</span>`;
         if (sec > 0) {
             window.localStorage.setItem('currentTime', sec);
@@ -94,7 +97,7 @@ function prepareTemplate(index) {
         template += `<li class="list-group-item"><button type="button" class="btn btn-primary" onclick="displayRadioValue(${index + 1})">Submit</button></li>`;
 
         document.getElementById('quizwizard').innerHTML = template;
-        let currentTime = getCurrenIndex('currentTime') ? getCurrenIndex('currentTime') : 10;
+        let currentTime = getCurrenIndex('currentTime') ? getCurrenIndex('currentTime') : 20;
         startTimer(currentTime);
     } else {
         resetForm();
@@ -110,22 +113,22 @@ function displayRadioValue(nextIndex) {
     let selectedQuestion = questions[nextIndex - 1];
 
     var options = document.getElementsByName('answer');
-
-    let selectedAnd = false;
+    
+    let selectedAns = false;
     let isChecked = false;
     for (i = 0; i < options.length; i++) {
         if (options[i].checked) {
             isChecked = true;
-            selectedAnd = options[i];
+            selectedAns = options[i];
         }
     }
     if (!isChecked) {
         $("#myModal").modal('show');
         return;
     }
-    selectedQuestion.isCorrect = selectedQuestion.correctAnswer === selectedAnd.value ? true : false;
+    selectedQuestion.isCorrect = selectedQuestion.correctAnswer === selectedAns.value ? true : false;
 
-    selectedQuestion.userOption = selectedAnd.value;
+    selectedQuestion.userOption = selectedAns.value;
     userAns.push(selectedQuestion);
 
     if (nextIndex >= questions.length) {
