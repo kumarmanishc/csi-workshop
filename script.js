@@ -97,7 +97,7 @@ function prepareTemplate(index) {
         template += `<li class="list-group-item"><button type="button" class="btn btn-primary" onclick="displayRadioValue(${index + 1})">Submit</button></li>`;
 
         document.getElementById('quizwizard').innerHTML = template;
-        let currentTime = getCurrenIndex('currentTime') ? getCurrenIndex('currentTime') : 20;
+        let currentTime = getCurrenIndex('currentTime') ? getCurrenIndex('currentTime') : 120;
         startTimer(currentTime);
     } else {
         resetForm();
@@ -113,7 +113,7 @@ function displayRadioValue(nextIndex) {
     let selectedQuestion = questions[nextIndex - 1];
 
     var options = document.getElementsByName('answer');
-    
+    console.log("options",options);
     let selectedAns = false;
     let isChecked = false;
     for (i = 0; i < options.length; i++) {

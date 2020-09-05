@@ -31,12 +31,48 @@ let questions = [
 let userAns = [];
 
 $(document).ready(function () {
-    var currentIndex = 0;
+    var currentIndex = getCurrenIndex() ? getCurrenIndex():0;
     prepareTemplate(currentIndex);
 });
 
+function getCurrenIndex(params = 'currentQueIndex') {
+    return parseInt(window.localStorage.getItem(params));
+};
+
+function getTime(val) {
+    let valString = val + "";
+    
+    if (valString.length < 2) {
+      
+        return "0" + valString;
+    } else {
+     
+        return valString;
+    }
+}
+
+function startTimer(sec) {
+
+    this.timer = setTimeout(() => {
+        
+        document.getElementById('time').innerHTML = `<span>${getTime(parseInt(sec / 60))}</span>:<span>${getTime(sec % 60)}</span>`;
+        if (sec > 0) {
+            window.localStorage.setItem('currentTime', sec);
+            startTimer(sec - 1);
+        } else {
+            window.localStorage.removeItem('currentTime');
+            let currentIndex = getCurrenIndex() + 1;
+            prepareTemplate(currentIndex);
+        }
+
+    }, 1000);
+}
 
 function prepareTemplate(index) {
+  
+    if (questions.length > index) {
+        clearTimeout(this.timer);
+    window.localStorage.setItem('currentQueIndex', index);
     const currentQuestion = questions[index];
 
     document.getElementById('questionTitle').innerHTML = currentQuestion.question;
@@ -59,38 +95,74 @@ function prepareTemplate(index) {
     template += `<li class="list-group-item"><button type="button" class="btn btn-primary" onclick="displayRadioValue(${index + 1})">Submit</button></li>`;
 
     document.getElementById('quizwizard').innerHTML = template;
-
+    let currentTime = getCurrenIndex('currentTime') ? getCurrenIndex('currentTime') : 120;
+    startTimer(currentTime);
+}else{
+    window.localStorage.removeItem('currentQueIndex');
+    resetForm();
+}
 }
 
 
 function displayRadioValue(nextIndex) {
-
+    window.localStorage.removeItem('currentTime');
     let selectedQuestion = questions[nextIndex - 1];
-
+   
     var options = document.getElementsByName('answer');
-
-    let selectedAnd = false;
-
+    
+    let selectedAns = false;
+    let isChecked = false;
     for (i = 0; i < options.length; i++) {
         if (options[i].checked) {
-            selectedAnd = options[i];
+            isChecked = true;
+            selectedAns = options[i];
         }
     }
 
-    if (selectedQuestion.correctAnswer === selectedAnd.value) {
-        console.log("Options are correct : ");
-    } else {
-        console.log('Wrong answer');
+    if (!isChecked) {
+        $("#myModal").modal('show');
+        return;
     }
-    selectedQuestion.userOption = selectedAnd.value;
+
+        
+   
+    selectedQuestion.isCorrect = selectedQuestion.correctAnswer === selectedAns.value ? true : false;
+
+    selectedQuestion.userOption = selectedAns.value;
     userAns.push(selectedQuestion);
+    console.log("userAns",userAns.length);
+    console.log("userAns",userAns);
 
     if (nextIndex >= questions.length) {
-        console.log("User Answers :", userAns);
-        let successTemplate = `<li class="list-group-item"><button type="button" class="btn btn-info" onclick="displayResult()">Show Quiz Result</button></li>`;
-
-        document.getElementById('quizwizard').innerHTML = "<b>Question is submitted successfully</b><br/>" + successTemplate;
+        resetForm();
     } else {
         prepareTemplate(nextIndex);
     }
 } 
+
+
+function resetForm(){
+    clearTimeout(this.timer);
+    document.getElementById('time').innerHTML = "";
+    document.getElementById('questionTitle').innerHTML = "";
+    window.localStorage.removeItem('currentQueIndex');
+    console.log("User Answers :", userAns);
+    let successTemplate = `<li class="list-group-item"><button type="button" class="btn btn-info" onclick="displayResult()">Show Quiz Result</button></li>`;
+    document.getElementById('quizwizard').innerHTML = successTemplate;
+}
+
+function displayResult() {
+
+    let attemptQue = userAns.length;
+   let correctAnswer = userAns.filter((item)=>item.isCorrect).length;
+   let totalQue =  questions.length;
+   console.log("attemptQue",attemptQue);
+   console.log("correctAnswer",correctAnswer);
+   console.log("totalQue",totalQue);
+
+   document.getElementById('totalQue').innerHTML = totalQue;
+   document.getElementById('attemptQue').innerHTML = attemptQue;
+   document.getElementById('correctAns').innerHTML = correctAnswer;
+
+   $("#showResult").modal('show');
+};
